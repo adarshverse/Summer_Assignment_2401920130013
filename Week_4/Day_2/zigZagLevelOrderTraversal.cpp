@@ -17,31 +17,38 @@ struct TreeNode {
 
 class Solution {
 public:
+    int height(TreeNode* root) {
+        if (root==NULL) return 0;
+        return 1 + max(height(root->left),height(root->right));
+    }
+
+    void order(TreeNode* root,int curr,int level,vector<int>& v) {
+        if (root==NULL) return;
+        if (curr == level) {
+            v.push_back(root->val);
+            return;
+        }
+        if (level % 2 != 0) {
+            order(root->left,curr+1,level,v);
+            order(root->right,curr+1,level,v);
+        } else {
+            order(root->right,curr+1,level,v);
+            order(root->left,curr+1,level,v);
+        }
+    }
+
+    void levelOrder(TreeNode* root,vector<vector<int>>& ans) {
+        int n = height(root);
+        for (int i = 1;i <= n;i++) {
+            vector<int> v;
+            order(root,1,i,v);
+            ans.push_back(v);
+        }
+    }
+
     vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
         vector<vector<int>> ans;
-        if (root==NULL) return ans;
-        queue<TreeNode*> q;
-        q.push(root);
-        bool LR = true;
-        while (q.size()>0) {
-            int n = q.size();
-            vector<int> v(n);
-            for (int i=0;i<n;i++) {
-                TreeNode* node = q.front();
-                q.pop();
-                int index;
-                if (LR) {
-                    index = i;
-                } else {
-                    index = n-1-i;
-                }
-                v[index] = node->val;
-                if (node->left) q.push(node->left);
-                if (node->right) q.push(node->right);
-            }
-            ans.push_back(v);
-            LR = !LR;
-        }
+        levelOrder(root,ans);
         return ans;
     }
 };
